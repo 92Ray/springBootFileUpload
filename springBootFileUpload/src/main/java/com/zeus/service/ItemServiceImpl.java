@@ -22,9 +22,9 @@ public class ItemServiceImpl implements ItemService {
 	}
 
 	@Override
-	public Item read(Item item) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+	public Item read(Item i) throws Exception {
+		Item item = itemMapper.read(i);
+		return item;
 	}
 
 	@Override
@@ -41,14 +41,13 @@ public class ItemServiceImpl implements ItemService {
 
 	@Override
 	public List<Item> list() throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		return itemMapper.list();
 	}
 
 	@Override
 	public String getPicture(Item item) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		String url = itemMapper.getPicture(item);
+		return url;
 	}
 
 }
