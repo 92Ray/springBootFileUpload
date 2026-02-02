@@ -3,13 +3,15 @@
 <mapper namespace="com.zeus.mapper.ItemMapper">
 	<insert id="create" parameterType="Item">
 		INSERT INTO item
-		(id, name, price, description, url)
+		(id, name,
+		price, description, url)
 		VALUES
-		(item_seq.NEXTVAL, #{name}, #{price}, #{description}, #{url})
+		(item_seq.NEXTVAL, #{name}, #{price},
+		#{description}, #{url})
 	</insert>
 
 	<select id="read" resultType="Item">
-	SELECT id, name, price, description, url FROM item WHERE id = #{id} 
+		SELECT id, name, price, description, url FROM item WHERE id = #{id}
 	</select>
 
 
@@ -19,24 +21,23 @@ WHERE id > 0  ORDER BY id DESC  ]]>
 	</select>
 
 	<select id="getPicture" resultType="String">
-	SELECT url FROM item WHERE id = #{id}
+		SELECT url FROM item WHERE id = #{id}
 	</select>
-	
-	<update id="update">
-    UPDATE item 
-    SET 
-        name = #{name}, 
-        price = #{price}, 
-        description = #{description}, 
-        url = #{url} 
-    WHERE 
-        id = #{id}
-</update>
 
-<delete id="delete"> 
-DELETE FROM item 
-WHERE id = #{id} 
-</delete>
-	
-	
+	<update id="update">
+		UPDATE item
+		SET
+		name = #{name},
+		price = #{price},
+		description = #{description},
+		url = #{url, jdbcType=VARCHAR} WHERE
+		id = #{id}
+	</update>
+
+	<delete id="delete">
+		DELETE FROM item
+		WHERE id = #{id}
+	</delete>
+
+
 </mapper>
