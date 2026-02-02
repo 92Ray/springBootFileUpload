@@ -85,6 +85,18 @@ public class ItemController {
 		FileCopyUtils.copy(fileData, target);
 		return createdFileName;
 	}
+	
+	// 외부저장소 자료업로드 파일명생성후 저장 
+	 // c:/upload/"../window/system.ini" 디렉토리 탈출공격(path tarversal) 
+	 private boolean deleteFile(String fileName) throws Exception { 
+	  if(fileName.contains("..")) { 
+	   throw new IllegalArgumentException("잘못된 경로 입니다."); 
+	  } 
+	  File file = new File(uploadPath, fileName); 
+	  return (file.exists() == true) ? (file.delete()):(false);  
+	 } 
+	
+	
 
 	@GetMapping("/list")
 	public String itemList(Model model) throws Exception {
@@ -100,6 +112,49 @@ public class ItemController {
 		model.addAttribute("item", item);
 		return "item/detail";
 	}
+	
+	@GetMapping("/updateForm")
+	public String itemUpdateForm(Item i, Model model) throws Exception {
+	    log.info("/item/updateForm");
+	    Item item = itemservice.read(i);
+	    model.addAttribute("item", item);
+	    return "item/updateForm"; // 반드시 jsp 파일명과 일치해야 함
+	}
+	
+
+	@PostMapping("/update")
+    public String itemUpdate(Item item, Model model) throws Exception {
+        log.info("itemUpdate" + item.toString());
+        MultipartFile file = item.getPicture();
+        String oldUrl = null;
+        if (file != null && file.getSize() > 0) {
+            // 기존의 있는 외부저장소에 있는 파일을 삭제
+            Item oldItem = itemservice.read(item);
+            oldUrl = oldItem.getUrl();
+
+            // 새로 등록 할 파일 
+            log.info("originalName: " + file.getOriginalFilename());
+            log.info("size: " + file.getSize());
+            log.info("contentType: " + file.getContentType());
+            String createdFileName = uploadFile(file.getOriginalFilename(), file.getBytes());
+            item.setUrl(createdFileName);
+        }
+        int count = itemservice.update(item);
+
+        if (count > 0) {
+            // 테이블에 수정내용이 완료가 되고 그리고 나서 이전 이미지 파일을 삭제한다.
+            if(oldUrl != null)    deleteFile(oldUrl);
+            model.addAttribute("message", "%s 상품 수정이 성공되었습니다.".formatted(item.getName()));
+            return "item/success";
+        }
+        model.addAttribute("message", "%s 상품 수정이 실패되었습니다.".formatted(item.getName()));
+        return "item/failed";
+    }
+	
+	
+	
+	
+	
 
 	// 화면요청이 아닌 데이터를 요청하는 것이 ResponseBody.
 	@ResponseBody
@@ -108,17 +163,17 @@ public class ItemController {
 		log.info("itemDiplay:");
 		// 파일을 읽기ㅟ
 		InputStream in = null;
-		ResponseEntity<byte[]> entity= null;
-		
+		ResponseEntity<byte[]> entity = null;
+
 		String url = itemservice.getPicture(item);
 		log.info("FILE NAME: " + url);
 		try {
 			String formatName = url.substring(url.lastIndexOf(".") + 1);
 			//
 			MediaType mType = getMediaType(formatName);
-			//클라이언트<->서버(heard. body)
+			// 클라이언트<->서버(heard. body)
 			HttpHeaders headers = new HttpHeaders();
-			//이미지파일을 inputSream으로 가져옴,
+			// 이미지파일을 inputSream으로 가져옴,
 			in = new FileInputStream(uploadPath + File.separator + url);
 			// 이미지파일타입이 널이 아니라면, 헤더에 이미지타입을 저장
 			if (mType != null) {
@@ -149,5 +204,25 @@ public class ItemController {
 		}
 		return null;
 	}
+	
+	
+	@RequestMapping("/delete") 
+	public String removeForm(Item item, Model model) throws Exception{
+		log.info("/delete item=" + item.toString());
+		String url = itemservice.getPicture(item);
+		int count = itemservice.delete(item);
+		
+		if (count>0) {
+			if(url != null) deleteFile(url);
+			model.addAttribute("message", "%s 상품삭제 성공".formatted(item.getId()));
+			return "item/success";
+		}
+		
+		model.addAttribute("message", "%s 상품삭제 tlfvo".formatted(item.getId()));
+		return "item/failed"; 
+	} 
+	
+	
+
 
 }
