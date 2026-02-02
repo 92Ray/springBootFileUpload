@@ -52,7 +52,7 @@ public class ItemController {
 		// 3.파일을 외장하드에 저장
 		String createdFileName = uploadFile(file.getOriginalFilename(), file.getBytes());
 		// 4.저장된 새로생성된 파일명을 item 도메인에 저장한다.
-		item.setUrl1(createdFileName);
+		item.setUrl(createdFileName);
 		// 5.테이블에 상품화면정보를 저장
 		int count = itemservice.create(item);
 
@@ -84,5 +84,15 @@ public class ItemController {
 		model.addAttribute("itemList", itemList);
 		return "item/List";
 	}
+	
+	
+	@GetMapping("/detail")
+    public String itemDetail(Item item,Model model) throws Exception {
+        log.info("/detail");
+        List<Item> itemList = itemservice.list();
+        model.addAttribute("itemList", itemList);
+        return "item/List";
+    }
+	
 
 }
