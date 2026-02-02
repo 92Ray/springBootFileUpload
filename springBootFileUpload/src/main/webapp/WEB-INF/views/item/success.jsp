@@ -93,8 +93,8 @@
     <h2>MISSION <span style="color:var(--t1-red)">COMPLETE</span></h2>
     <p>${message}</p>
 
-    <a href="/member/insertForm" class="btn-list">New Member Insert</a>
-    <a href="/member/memberList" class="btn-list">View Member List</a>
+    <a href="/item/createForm" class="btn-list">상품등록</a>
+    <a href="/item/list" class="btn-list">상품리스트</a>
 
 </div>
 

@@ -13,7 +13,7 @@ public class Item implements Serializable{
     private String name;
     private Integer price;
     private String description; 
-    private String url;
+    private String url1;
     private MultipartFile picture;
 
 }
